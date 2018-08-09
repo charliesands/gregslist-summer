@@ -25,6 +25,14 @@ function drawHouses() {
 
 export default class HouseController {
   constructor() {
+    drawHouses()
+  }
 
+  addHouse(event) {
+    event.preventDefault();
+    let formData = event.target
+    houseService.addHouse(formData)
+    formData.reset()
+    drawHouses()
   }
 }
