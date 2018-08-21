@@ -1,36 +1,39 @@
 import House from '../../models/House.js'
 
-let houses = []
+//@ts-ignore
+const housesApi = axios.create({
+  baseURL: 'http://localhost:3000/api/houses',
+  timeout: 3000
+})
 
 export default class HouseService {
   constructor() {
 
   }
 
-  getHouses() {
-    let housesCopy = []
-    houses.forEach(house => {
-      housesCopy.push(new House(
-        house.address,
-        house.color,
-        house.rooms,
-        house.price,
-        house.imgUrl
-      ))
+  getHouses(draw) {
+    housesApi.get()
+      .then(res => {
+        let houses = res.data.map(rawHouse => {
+          return new House(rawHouse)
+        })
+        draw(houses)
+      })
+  }
+
+  addHouse(formData, draw) {
+    let newHouse = new House({
+      bedrooms: formData.bedrooms.value,
+      bathrooms: formData.bathrooms.value,
+      imgUrl: formData.imgUrl.value,
+      levels: formData.levels.value,
+      year: formData.year.value,
+      price: formData.price.value,
+      description: formData.description.value
     })
-    return housesCopy
+    housesApi.post('', newHouse)
+      .then(res => {
+        this.getHouses(draw)
+      })
   }
-
-  addHouse(formData) {
-    let newHouse = new House(
-      formData.address.value,
-      formData.color.value,
-      formData.rooms.value,
-      formData.price.value,
-      formData.imgUrl.value
-    )
-    houses.push(newHouse)
-    console.log(houses)
-  }
-
 }

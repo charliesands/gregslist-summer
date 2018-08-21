@@ -2,19 +2,18 @@ import HouseService from './HouseService.js'
 
 let houseService = new HouseService()
 
-
-function drawHouses() {
-  let houses = houseService.getHouses()
+function drawHouses(houses) {
   let template = ''
-
   for (let i = 0; i < houses.length; i++) {
     const house = houses[i];
     template += `
   <div style="outline: 1px solid black" class="col-3">
-  <p>Address: ${house.address}</p>
-  <p>${house.color}</p>
-  <p>${house.rooms}</p>
+  <p>${house.bedrooms}</p>
+  <p>${house.bathrooms}</p>
+  <p>${house.levels}</p>
+  <p>${house.year}</p>
   <p>${house.price}</p>
+  <p>${house.description}</p>
     <img src="${house.imgUrl}" alt="somethingelse">
 </div>
   `
@@ -25,14 +24,14 @@ function drawHouses() {
 
 export default class HouseController {
   constructor() {
-    drawHouses()
+    houseService.getHouses(drawHouses)
+
   }
 
-  addHouse(event) {
-    event.preventDefault();
-    let formData = event.target
-    houseService.addHouse(formData)
+  addHouse(e) {
+    e.preventDefault();
+    let formData = e.target
+    houseService.addHouse(formData, drawHouses)
     formData.reset()
-    drawHouses()
   }
 }

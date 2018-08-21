@@ -2,41 +2,48 @@ import CarService from "./CarService.js";
 
 let carService = new CarService()
 
-function drawCars() {
-  let cars = carService.getCars()
+function drawCars(cars) {
   let template = ''
-
   for (let i = 0; i < cars.length; i++) {
     const car = cars[i];
     template += `
     <div style="outline: 1px solid black" class="col-3">
-        <p>Make: ${car.make}</p>
+        <p>${car.make}</p>
         <p>${car.model}</p>
         <p>${car.price}</p>
+        <button onclick="app.controllers.carController.bid('${car._id}', ${car.price})">BID</button>
         <p>${car.year}</p>
-        <p>${car.color}</p>
+        <p>${car.description}</p>
         <img src="${car.imgUrl}" alt="somethingelse">
+        <button onclick="app.controllers.carController.deleteCar('${car._id}')">DELETE</button>
     </div>
     `
   }
-
   document.getElementById('cars').innerHTML = template
-
-
 }
 
 export default class CarController {
 
   constructor() {
-    drawCars()
+    carService.getCars(drawCars)
   }
 
-  addCar(triggeredEvent) {
-    triggeredEvent.preventDefault();
-    let formData = triggeredEvent.target
-    carService.addCar(formData)
+  addCar(e) {
+    e.preventDefault();
+    let formData = e.target
+    carService.addCar(formData, drawCars)
     formData.reset()
-    drawCars()
   }
 
+  deleteCar(carId) {
+    carService.deleteCar(carId, drawCars)
+  }
+
+  bid(carId, price) {
+    price = 0
+    let update = {
+      price: price
+    }
+    carService.bid(carId, update, drawCars)
+  }
 }

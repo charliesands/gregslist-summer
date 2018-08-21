@@ -1,47 +1,53 @@
 import Car from '../../models/Car.js'
 
-let cars = []
+//@ts-ignore
+const carsApi = axios.create({
+  baseURL: 'http://localhost:3000/api/cars',
+  timeout: 3000
+})
 
 export default class CarService {
   constructor() {
 
   }
 
-  getCars() {
-    let carsCopy = []
-
-    //same as below
-    // for (let i = 0; i < cars.length; i++) {
-    //   const car = cars[i];
-
-    // }
-
-    // this is just saying for each 'car'
-    //  in the whole cars array do whatever is in the code block 
-    cars.forEach(car => {
-      carsCopy.push(new Car(
-        car.make,
-        car.model,
-        car.year,
-        car.price,
-        car.color,
-        car.imgUrl
-      ))
-    })
-    return carsCopy
+  getCars(draw) {
+    carsApi()
+      .then(res => {
+        let cars = res.data.map(rawCar => {
+          return new Car(rawCar)
+        })
+        draw(cars)
+      })
   }
 
-  addCar(formData) {
-    let newCar = new Car(
-      formData.make.value,
-      formData.model.value,
-      formData.year.value,
-      formData.price.value,
-      formData.color.value,
-      formData.imgUrl.value
-    )
-    cars.push(newCar)
-    console.log(cars)
+  addCar(formData, draw) {
+    let newCar = new Car({
+      make: formData.make.value,
+      model: formData.model.value,
+      year: formData.year.value,
+      price: formData.price.value,
+      description: formData.description.value,
+      imgUrl: formData.imgUrl.value
+    })
+    carsApi.post('', newCar)
+      .then(res => {
+        this.getCars(draw)
+      })
 
+  }
+  deleteCar(carId, draw) {
+    carsApi.delete(carId)
+      .then(res => {
+        this.getCars(draw)
+
+      })
+  }
+  bid(carId, update, draw) {
+    carsApi.put(carId, update)
+      .then(res => {
+        console.log(res)
+        this.getCars(draw)
+      })
   }
 }
